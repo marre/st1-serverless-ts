@@ -1,9 +1,11 @@
 language: node_js
 
+before_install:
+- export TZ=Europe/Stockholm
+
 node_js:
 - node
 
 cache:
   directories:
     - node_modules
-    

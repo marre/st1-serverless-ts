@@ -9,3 +9,9 @@ node_js:
 cache:
   directories:
     - node_modules
+
+deploy:
+  provider: script
+  script:
+    - npm install -g serverless
+    - sls deploy

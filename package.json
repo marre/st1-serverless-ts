@@ -1,0 +1,36 @@
+{
+  "name": "st1",
+  "version": "0.0.1",
+  "author": "Markus Eriksson",
+  "license": "ISC",
+  "dependencies": {
+    "@types/request": "^2.47.0",
+    "@types/request-promise": "^4.1.41",
+    "@types/winston": "^2.3.9",
+    "mongodb": "^3.0.8",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
+    "rxjs": "^5.5.11",
+    "twit": "^2.2.9",
+    "winston": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.5",
+    "@types/jest": "^22.2.3",
+    "@types/mongodb": "^3.0.18",
+    "@types/node": "^9.6.18",
+    "@types/twit": "^2.2.12",
+    "jest": "^22.4.4",
+    "serverless-offline": "^3.24.3",
+    "serverless-webpack": "^5.1.5",
+    "ts-jest": "^22.4.6",
+    "ts-loader": "^4.3.0",
+    "tslint": "^5.10.0",
+    "typescript": "^2.8.3",
+    "webpack": "^4.9.2",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}

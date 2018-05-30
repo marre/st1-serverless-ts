@@ -13,6 +13,7 @@ cache:
 install:
   - "npm install -g typescript"
   - "npm install -g serverless"
+  - "npm install -g serverless-webpack"
   - "npm install"
 
 deploy:

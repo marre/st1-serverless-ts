@@ -35,6 +35,11 @@ provider:
 #  exclude:
 #    - exclude-me.js
 #    - exclude-me-dir/**
+package: # Optional deployment packaging configuration
+  exclude: # Specify the directories and files which should be excluded in the deployment package
+    - scripts/**
+    - env.sh
+    - .travis.yml
 
 functions:
   st1price:

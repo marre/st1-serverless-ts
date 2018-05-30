@@ -6,9 +6,9 @@ before_install:
 node_js: 
   - "8.10"
 
-cache:
-  directories:
-    - node_modules
+#cache:
+#  directories:
+#    - node_modules
 
 install:
   - "npm install -g typescript"

@@ -1,15 +1,15 @@
 ## Serverless st1 petrol price thingy
 
-St1 petrol stations in Sweden has been tweeting real time price changes since 2014. This project polls twitter and stores all St1 tweets into a mongo database. The project also provides a simple HTTP API that publishes historic prices for any St1 petrol station.
+St1 petrol stations in Sweden is tweeting petrol price changes in real time since 2014. This project polls these price changes and stores them into a mongo database. The project also provides a simple HTTP API that makes it possible to retrieve historic prices for any St1 petrol station.
+
+This is actually v2 of this project, the original project was written in python and deployed to heroku (https://st1price.herokuapp.com). This remake is my way of learning more about serverless, typescript, mongo and modern web frontends.
 
 TODO:
- * Setup CI/CD with travis
  * Automate the update of the cachefile
- * A webapp that acutally displays the data
+ * A webapp that graphs the data
  * Swagger file for the API
  * Visualise test coverage
- * Use cloudflare CDN for caching petrol prices?
- * HTTPS
+ * Use cloudflare CDN for caching petrol prices
 
 ## Init cachefile
 
@@ -23,4 +23,4 @@ ts-node src/st1dump.ts > data/dump-2018-05-28.json
 cat data/dump-2018-05-28.json | ts-node src/st1parse.ts > data/tweets-2018-05-28.parsed.json
 ```
 
-The resulting file can then be uploaded to the s3 bucket.
+The resulting file can then be uploaded to a s3 bucket.

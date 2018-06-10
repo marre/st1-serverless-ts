@@ -74,5 +74,9 @@ export const price: APIGatewayProxyHandler = (
   callback: Callback<APIGatewayProxyResult>,
 ): void => {
   priceHandler(event, context)
-    .then((result) => callback(null, result));
+    .then((result) => callback(null, result))
+    .catch((err) => {
+      logger.info("Error %s", err);
+      callback(err);
+    });
 };

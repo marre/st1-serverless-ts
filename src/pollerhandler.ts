@@ -69,9 +69,11 @@ async function pollerHandler(
             const newestTweets = st1Twitter.fetchTweetsNewerThan(id);
             storeTweets(newestTweets)
                 .then((_) => {
+                    logger.info("Tweets stored successfully");
                     context.succeed("Tweets stored successfully");
                 })
                 .catch((err) => {
+                    logger.info("Error storing tweets : %s", err);
                     context.fail(err);
                 });
         });
@@ -83,5 +85,9 @@ export const poller: ScheduledHandler = (
     callback: Callback<void>,
 ): void => {
   pollerHandler(event, context)
-    .then((result) => callback(null, result));
+    .then((result) => callback(null, result))
+    .catch((err) => {
+        logger.info("Error %s", err);
+        callback(err);
+    });
 };

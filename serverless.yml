@@ -55,4 +55,4 @@ functions:
     handler: src/pollerhandler.poller
     memorySize: 256
     events:
-      - schedule: rate(15 minutes)
+      - schedule: cron(0/15 * * * ? *)

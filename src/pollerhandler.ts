@@ -56,6 +56,9 @@ async function pollerHandler(
     event: ScheduledEvent,
     context: Context,
   ): Promise<void> {
+    // Allow exit even if we have some unfinished work waiting
+    context.callbackWaitsForEmptyEventLoop = false;
+
     logger.info("Find latest tweet id");
 
     findLatestTweetId()
@@ -84,10 +87,13 @@ export const poller: ScheduledHandler = (
     context: Context,
     callback: Callback<void>,
 ): void => {
-  pollerHandler(event, context)
-    .then((result) => callback(null, result))
-    .catch((err) => {
-        logger.info("Error %s", err);
-        callback(err);
-    });
+    pollerHandler(event, context)
+        .then((result) => {
+            logger.info("Callback");
+            callback(null, result);
+        })
+        .catch((err) => {
+            logger.info("Error %s", err);
+            callback(err);
+        });
 };

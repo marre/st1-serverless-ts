@@ -35,8 +35,8 @@ function storeTweets(tweetStream: Observable<ITweetDoc>): Promise<void> {
         tweetStream.toArray().subscribe(
             (tweets) => {
                 if (tweets.length === 0) {
-                    logger.info("No new tweets");
-                    process.exit();
+                    logger.info("No new tweets. Nothing to store.");
+                    resolve();
                     return;
                 }
 

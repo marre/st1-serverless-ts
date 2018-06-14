@@ -79,6 +79,10 @@ async function pollerHandler(
                     logger.info("Error storing tweets : %s", err);
                     context.fail(err);
                 });
+        })
+        .catch((err) => {
+            logger.info("Error finding latest tweet id : %s", err);
+            context.fail(err);
         });
 }
 

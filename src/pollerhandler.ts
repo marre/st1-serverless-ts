@@ -61,29 +61,15 @@ async function pollerHandler(
 
     logger.info("Find latest tweet id");
 
-    findLatestTweetId()
-        .then((id) => {
-            const idStr = id.toString();
-            logger.info("Latest tweet id is %s", idStr);
+    const id: Long = await findLatestTweetId();
+    const idStr = id.toString();
+    logger.info("Latest tweet id is %s", idStr);
 
-            // Should probably stream the tweets to mongo with backpressure and what not...
-            logger.info("Fetching tweets newer than %s", idStr);
-
-            const newestTweets = st1Twitter.fetchTweetsNewerThan(id);
-            storeTweets(newestTweets)
-                .then((_) => {
-                    logger.info("Tweets stored successfully");
-                    context.succeed("Tweets stored successfully");
-                })
-                .catch((err) => {
-                    logger.info("Error storing tweets : %s", err);
-                    context.fail(err);
-                });
-        })
-        .catch((err) => {
-            logger.info("Error finding latest tweet id : %s", err);
-            context.fail(err);
-        });
+    // Should probably stream the tweets to mongo with backpressure and what not...
+    logger.info("Fetching and storing tweets newer than %s", idStr);
+    const newestTweets = st1Twitter.fetchTweetsNewerThan(id);
+    await storeTweets(newestTweets);
+    logger.info("Tweets stored successfully");
 }
 
 export const poller: ScheduledHandler = (

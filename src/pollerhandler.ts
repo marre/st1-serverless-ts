@@ -1,12 +1,13 @@
 import { Callback, Context, ScheduledEvent, ScheduledHandler } from "aws-lambda";
 // Borrow Long from mongo as a 64 bit integer for tweet ids
 import { Long } from "mongodb";
-import { Observable, Subscriber } from "rxjs/Rx";
-import { Logger, transports  } from "winston";
+import { Observable, Subscriber } from "rxjs";
+import { toArray } from 'rxjs/operators';
+import { createLogger, transports } from "winston";
 import { St1Repository } from "./St1Repository";
 import { ITweetDoc, St1TwitterClient } from "./St1TwitterClient";
 
-const logger = new Logger({ transports: [ new transports.Console() ] });
+const logger = createLogger({ transports: [ new transports.Console() ] });
 
 const st1Repo = new St1Repository(process.env.MONGODB_ATLAS_CLUSTER_URI_RW || "");
 const st1Twitter = new St1TwitterClient({
@@ -32,7 +33,9 @@ async function findLatestTweetId(): Promise<Long> {
 
 function storeTweets(tweetStream: Observable<ITweetDoc>): Promise<void> {
     return new Promise((resolve, reject) => {
-        tweetStream.toArray().subscribe(
+        tweetStream.pipe(
+            toArray()
+        ).subscribe(
             (tweets) => {
                 if (tweets.length === 0) {
                     logger.info("No new tweets. Nothing to store.");

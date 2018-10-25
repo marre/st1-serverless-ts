@@ -5,6 +5,6 @@ const st1Repo = new St1Repository(atlasUri);
 
 st1Repo.findAll().subscribe(
     (st1data) => process.stdout.write(JSON.stringify(st1data)),
-    (error) => process.stderr.write("Failed to read from mongo " + error),
+    (error) => process.stderr.write("Failed to read from mongo " + error + "\n"),
     () => process.exit(),
 );

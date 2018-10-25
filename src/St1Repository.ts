@@ -1,16 +1,18 @@
 import { Collection, Long, MongoClient } from "mongodb";
-import { Observable } from "rxjs/Rx";
-import { Logger, transports } from "winston";
+import { Observable } from "rxjs";
+import { createLogger, transports } from "winston";
 
 import { ITweetDoc } from "./St1TwitterClient";
 
-const logger = new Logger({ transports: [ new transports.Console() ] });
+const logger = createLogger({ transports: [ new transports.Console() ] });
 
 export class St1Repository {
     private mongo: Promise<MongoClient>;
 
     constructor(mongoUrl: string) {
-        this.mongo = MongoClient.connect(mongoUrl);
+        // Connect here in constructor to make sure that we only
+        // initiate a single connection
+        this.mongo = MongoClient.connect(mongoUrl, { useNewUrlParser: true });
     }
 
     public async findLatest(): Promise<ITweetDoc> {
@@ -35,7 +37,8 @@ export class St1Repository {
                                 subscriber.complete();
                             }
                         });
-                    });
+                    })
+                .catch((err) => subscriber.error(err))
         });
     }
 
@@ -58,7 +61,8 @@ export class St1Repository {
                                 subscriber.complete();
                             }
                         });
-                });
+                })
+                .catch((err) => subscriber.error(err));
         });
     }
 
@@ -69,9 +73,7 @@ export class St1Repository {
 
     private async getCollection(): Promise<Collection> {
         const client = await this.mongo;
-
         const db = client.db("st1price");
         return db.collection("st1price");
     }
-
 }

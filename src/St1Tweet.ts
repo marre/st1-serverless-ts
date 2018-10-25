@@ -1,6 +1,5 @@
 // Borrow Long from mongo as a 64 bit integer for tweet ids
 import { Long } from "mongodb";
-import { St1 } from "./St1";
 
 // Represents a parsed St1 tweet, with petrol prices, location etc
 export class St1Tweet {

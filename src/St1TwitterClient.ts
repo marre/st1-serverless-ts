@@ -1,7 +1,7 @@
 import Twit = require("twit");
 
 import { Long } from "mongodb";
-import { Observable, Subscriber } from "rxjs/Rx";
+import { Observable, Subscriber } from "rxjs";
 
 export interface ITweetDoc {
     // A twitter id (snowflake) is a 64 bit integer.

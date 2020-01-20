@@ -62,7 +62,7 @@ export class St1Repository {
                             }
                         });
                 })
-                .catch((err) => subscriber.error(err));
+                .catch((err) => subscriber.error(err));                
         });
     }
 
@@ -73,7 +73,9 @@ export class St1Repository {
 
     private async getCollection(): Promise<Collection> {
         const client = await this.mongo;
+
         const db = client.db("st1price");
         return db.collection("st1price");
     }
+
 }

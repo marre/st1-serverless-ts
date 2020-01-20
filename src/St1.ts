@@ -69,7 +69,7 @@ export class St1 {
             .subscribe(
                 (st1TweetData) => st1.appendTweetFromData(st1TweetData),
                 (err) => {
-                    logger.error("Failed to fill with data from stream, using cached data only. %s", err);
+                    logger.error("Failed to create with data from stream, using cached data only. %s", err);
                     resolve(st1);
                 },
                 () => resolve(st1)

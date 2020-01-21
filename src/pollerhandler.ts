@@ -3,12 +3,15 @@ import { Callback, Context, ScheduledEvent, ScheduledHandler } from "aws-lambda"
 import { Long } from "mongodb";
 import { Observable, Subscriber } from "rxjs";
 import { toArray } from 'rxjs/operators';
-import { createLogger, transports } from "winston";
+import { createLogger, format, transports  } from "winston";
 import { St1Repository } from "./St1Repository";
 import { ITweetDoc, St1TwitterClient } from "./St1TwitterClient";
 
-const logger = createLogger({ transports: [ new transports.Console() ] });
-
+const logger = createLogger({ 
+    format: format.splat(),
+    transports: [ new transports.Console() ] 
+  });
+  
 const st1Repo = new St1Repository(process.env.MONGODB_ATLAS_CLUSTER_URI_RW || "");
 const st1Twitter = new St1TwitterClient({
     accessToken: process.env.TWITTER_ACCESS_TOKEN || "",

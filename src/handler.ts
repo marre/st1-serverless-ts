@@ -1,9 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult, Callback, Context} from "aws-lambda";
-import { createLogger, transports  } from "winston";
+import { createLogger, format, transports  } from "winston";
 import { St1 } from "./St1";
 import { St1Repository } from "./St1Repository";
 
-const logger = createLogger({ transports: [ new transports.Console() ] });
+const logger = ({ 
+  format: format.splat(),
+  transports: [ new transports.Console() ] 
+});
 
 let cachedSt1: St1;
 

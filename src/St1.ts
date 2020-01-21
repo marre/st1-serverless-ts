@@ -4,14 +4,17 @@ import rp = require("request-promise-native");
 // Borrow Long from mongo as a 64 bit integer for tweet ids
 import { Long } from "mongodb";
 import { map } from 'rxjs/operators';
-import { createLogger, transports } from "winston";
+import { createLogger, format, transports } from "winston";
 import { splitStream } from "./splitStream";
 import { St1Repository } from "./St1Repository";
 import { St1Tweet } from "./St1Tweet";
 import { ITweetDoc } from "./St1TwitterClient";
 
-const logger = createLogger({ transports: [ new transports.Console() ] });
-
+const logger = createLogger({ 
+    format: format.splat(),
+    transports: [ new transports.Console() ] 
+  });
+  
 const b95 = "b95";
 const diesel = "diesel";
 const e85 = "e85";

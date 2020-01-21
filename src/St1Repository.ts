@@ -1,10 +1,13 @@
 import { Collection, Long, MongoClient } from "mongodb";
 import { Observable } from "rxjs";
-import { createLogger, transports } from "winston";
+import { createLogger, format, transports } from "winston";
 
 import { ITweetDoc } from "./St1TwitterClient";
 
-const logger = createLogger({ transports: [ new transports.Console() ] });
+const logger = createLogger({ 
+    format: format.splat(),
+    transports: [ new transports.Console() ] 
+});
 
 export class St1Repository {
     private mongo: Promise<MongoClient>;
@@ -12,7 +15,10 @@ export class St1Repository {
     constructor(mongoUrl: string) {
         // Connect here in constructor to make sure that we only
         // initiate a single connection
-        this.mongo = MongoClient.connect(mongoUrl, { useNewUrlParser: true });
+        this.mongo = MongoClient.connect(mongoUrl, { 
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
     }
 
     public async findLatest(): Promise<ITweetDoc> {

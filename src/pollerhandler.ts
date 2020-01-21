@@ -8,8 +8,11 @@ import { St1Repository } from "./St1Repository";
 import { ITweetDoc, St1TwitterClient } from "./St1TwitterClient";
 
 const logger = createLogger({ 
-    format: format.splat(),
-    transports: [ new transports.Console() ] 
+    format: format.combine(
+        format.splat(),
+        format.simple()
+      ),
+        transports: [ new transports.Console() ] 
   });
   
 const st1Repo = new St1Repository(process.env.MONGODB_ATLAS_CLUSTER_URI_RW || "");

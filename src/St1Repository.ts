@@ -5,9 +5,12 @@ import { createLogger, format, transports } from "winston";
 import { ITweetDoc } from "./St1TwitterClient";
 
 const logger = createLogger({ 
-    format: format.splat(),
-    transports: [ new transports.Console() ] 
-});
+    format: format.combine(
+        format.splat(),
+        format.simple()
+      ),
+      transports: [ new transports.Console() ] 
+  });
 
 export class St1Repository {
     private mongo: Promise<MongoClient>;

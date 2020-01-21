@@ -11,7 +11,10 @@ import { St1Tweet } from "./St1Tweet";
 import { ITweetDoc } from "./St1TwitterClient";
 
 const logger = createLogger({ 
-    format: format.splat(),
+    format: format.combine(
+        format.splat(),
+        format.simple()
+    ),
     transports: [ new transports.Console() ] 
   });
   

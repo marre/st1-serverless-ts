@@ -3,9 +3,12 @@ import { St1 } from "./St1";
 import { St1Repository } from "./St1Repository";
 
 const logger = createLogger({ 
-    format: format.splat(),
+    format: format.combine(
+        format.splat(),
+        format.simple()
+    ),
     transports: [ new transports.Console() ] 
-  });
+});
   
 const atlasUri: string = process.env.MONGODB_ATLAS_CLUSTER_URI_R || "";
 const st1Repo = new St1Repository(atlasUri);

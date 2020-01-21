@@ -3,7 +3,7 @@ import { createLogger, format, transports  } from "winston";
 import { St1 } from "./St1";
 import { St1Repository } from "./St1Repository";
 
-const logger = ({ 
+const logger = createLogger({ 
   format: format.splat(),
   transports: [ new transports.Console() ] 
 });

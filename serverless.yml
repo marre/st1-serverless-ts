@@ -25,7 +25,7 @@ provider:
     TWITTER_ACCESS_TOKEN_SECRET: ${ssm:TWITTER_ACCESS_TOKEN_SECRET~true}
     TWITTER_CONSUMER_KEY: ${ssm:TWITTER_CONSUMER_KEY~true}
     TWITTER_CONSUMER_SECRET: ${ssm:TWITTER_CONSUMER_SECRET~true}
-    ST1_CACHE_URI: https://s3.amazonaws.com/st1price/tweets-2018-05-26.parsed.json
+    ST1_CACHE_URI: https://st1price.s3.amazonaws.com/tweets-2020-01-25.parsed.json
 
 # you can add packaging information here
 #package:

@@ -3,21 +3,21 @@ import rp = require("request-promise-native");
 
 // Borrow Long from mongo as a 64 bit integer for tweet ids
 import { Long } from "mongodb";
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 import { createLogger, format, transports } from "winston";
 import { splitStream } from "./splitStream";
-import { St1Repository } from "./St1Repository";
+import { St1Repository, IStoredTweetDoc } from "./St1Repository";
 import { St1Tweet } from "./St1Tweet";
-import { ITweetDoc } from "./St1TwitterClient";
+import { Tweet } from "./Tweet";
 
-const logger = createLogger({ 
+const logger = createLogger({
     format: format.combine(
         format.splat(),
         format.simple()
     ),
-    transports: [ new transports.Console() ] 
+    transports: [ new transports.Console() ]
   });
-  
+
 const b95 = "b95";
 const diesel = "diesel";
 const e85 = "e85";
@@ -31,9 +31,12 @@ interface IPriceByLocation {
     [location: string]: IPrice;
 }
 
-// Cache file contents. JSON in the following format
+/**
+ * Defines the cache file format.
+ */
 interface ISt1Cache {
-    lastTweetId: Long;
+    // Storing lastTweetId as String to make it possible to quickly load this JSON with JSON.parse
+    lastTweetId: string;
     tweetsByLocation: IPriceByLocation;
 }
 
@@ -43,7 +46,7 @@ export class St1 {
     }
 
     public static createFromCache(cache: ISt1Cache): St1 {
-        const lastTweetId: Long = cache.lastTweetId;
+        const lastTweetId: Long = Long.fromString(cache.lastTweetId);
         const tweetsByLocation: IPriceByLocation = cache.tweetsByLocation;
 
         return new St1(lastTweetId, tweetsByLocation);
@@ -51,7 +54,8 @@ export class St1 {
 
     public static async createFromCacheData(cacheData: string): Promise<St1> {
         // TODO: This parse() is slow!
-        const parsedData: ISt1Cache = JSON.parse(cacheData);
+        const parsedData = JSON.parse(cacheData);
+        // TODO: Can we verify that it actually is ISt1Cache??
         return St1.createFromCache(parsedData);
     }
 
@@ -71,6 +75,7 @@ export class St1 {
         return new Promise((resolve, reject) => {
             splitStream(readStream).pipe(
                 map((row) => JSON.parse(row)),
+                map((parsed) => new Tweet(parsed._id, parsed.text))
             )
             .subscribe(
                 (st1TweetData) => st1.appendTweetFromData(st1TweetData),
@@ -89,7 +94,7 @@ export class St1 {
         return new Promise((resolve, reject) => {
             st1repository.findAll()
                 .subscribe(
-                    (st1TweetData) => st1.appendTweetFromData(st1TweetData),
+                    (st1TweetData) => st1.appendTweetFromData(toTweet(st1TweetData)),
                     (err) => {
                         logger.error("Failed to create with data from db, using cached data only. %s", err);
                         resolve(st1);
@@ -108,7 +113,7 @@ export class St1 {
     // Export as ISt1Cache
     public toJSON(): ISt1Cache {
         return {
-            lastTweetId: this.lastTweetId,
+            lastTweetId: this.lastTweetId.toString(),
             tweetsByLocation: this.priceByLocation,
         };
     }
@@ -131,7 +136,7 @@ export class St1 {
         return new Promise((resolve, reject) => {
             st1repository.findNew(this.lastTweetId)
                 .subscribe(
-                    (st1TweetData) => this.appendTweetFromData(st1TweetData),
+                    (st1TweetData) => this.appendTweetFromData(toTweet(st1TweetData)),
                     (err) => {
                         logger.error("Failed to fill with data from db, using cached data only. %s", err);
                         resolve(this);
@@ -141,8 +146,8 @@ export class St1 {
         });
     }
 
-    public appendTweetFromData(st1TweetData: ITweetDoc) {
-        const parsedTweet = parseTweet(st1TweetData);
+    public appendTweetFromData(tweet: Tweet) {
+        const parsedTweet = parseTweet(tweet);
 
         if (parsedTweet === null) {
             // Failed to parse tweet. Skip it...
@@ -154,7 +159,8 @@ export class St1 {
             return;
         }
 
-        if (this.lastTweetId >= parsedTweet.tweetId) {
+        const parsedTweetId = Long.fromString(parsedTweet.tweetId);
+        if (this.lastTweetId.greaterThanOrEqual(parsedTweetId)) {
             // To old. Skip it...
             return;
         }
@@ -169,7 +175,7 @@ export class St1 {
             priceForLocation[diesel] = [];
         }
 
-        this.lastTweetId = parsedTweet.tweetId;
+        this.lastTweetId = parsedTweetId;
 
         const epoch = parsedTweet.date.getTime();
         if (parsedTweet.b95 !== undefined) {
@@ -184,6 +190,22 @@ export class St1 {
             priceForLocation[e85].push([epoch, parsedTweet.e85]);
         }
     }
+}
+
+export function toIStoredTweetDoc(tweet: Tweet): IStoredTweetDoc {
+    const storedTweetDoc:IStoredTweetDoc = {
+        _id: Long.fromString(tweet.tweetId),
+        text: tweet.text,
+    };
+
+    return storedTweetDoc;
+}
+
+export function toTweet(storedTweetDoc: IStoredTweetDoc): Tweet {
+    return new Tweet(
+        storedTweetDoc._id.toString(),
+        storedTweetDoc.text,
+    );
 }
 
 async function readUri(uri: string): Promise<string> {
@@ -204,16 +226,8 @@ function readFile(filename: string): Promise<string> {
     });
 }
 
-function parseTweet(tweet: ITweetDoc): St1Tweet | null {
-    const text = tweet.text;
-    if (text === undefined) {
-        return null;
-    }
-
-    const tweetId = tweet._id;
-    if (tweetId === undefined) {
-        return null;
-    }
-
-    return St1Tweet.parse(tweetId, text);
+function parseTweet(tweet: Tweet): St1Tweet | null {
+    return St1Tweet.parse(
+        tweet.tweetId,
+        tweet.text);
 }

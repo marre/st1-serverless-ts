@@ -1,9 +1,6 @@
-// Borrow Long from mongo as a 64 bit integer for tweet ids
-import { Long } from "mongodb";
-
 // Represents a parsed St1 tweet, with petrol prices, location etc
 export class St1Tweet {
-    public static parse(tweetId: Long, tweetText: string): St1Tweet | null {
+    public static parse(tweetId: string, tweetText: string): St1Tweet | null {
         if (! St1Tweet.maybePriceTweet(tweetText)) {
             return null;
         }
@@ -71,7 +68,7 @@ export class St1Tweet {
     }
 
     private constructor(
-        public readonly tweetId: Long,
+        public readonly tweetId: string,
         public readonly location: string,
         public readonly date: Date,
         public readonly e85?: number,

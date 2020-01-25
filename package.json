@@ -19,6 +19,7 @@
     "@types/request": "^2.48.4",
     "@types/request-promise-native": "^1.0.17",
     "@types/twit": "^2.2.23",
+    "ajv": "^6.9.1",
     "jest": "^24.9.0",
     "serverless-offline": "^3.31.0",
     "serverless-webpack": "^5.3.1",
@@ -28,8 +29,7 @@
     "tslint": "^5.20.1",
     "typescript": "^3.7.5",
     "webpack": "^4.41.5",
-    "webpack-node-externals": "^1.7.2",
-    "ajv": "^6.9.1"
+    "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
     "test": "jest"

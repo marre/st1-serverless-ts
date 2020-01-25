@@ -1,45 +1,43 @@
 import { Callback, Context, ScheduledEvent, ScheduledHandler } from "aws-lambda";
-// Borrow Long from mongo as a 64 bit integer for tweet ids
-import { Long } from "mongodb";
 import { Observable, Subscriber } from "rxjs";
-import { toArray } from 'rxjs/operators';
+import { map, toArray } from 'rxjs/operators';
 import { createLogger, format, transports  } from "winston";
 import { St1Repository } from "./St1Repository";
-import { ITweetDoc, St1TwitterClient } from "./St1TwitterClient";
+import { Tweet } from "./Tweet";
+import { TwitterClient } from "./TwitterClient";
+import { toIStoredTweetDoc } from "./St1"
 
-const logger = createLogger({ 
+const logger = createLogger({
     format: format.combine(
         format.splat(),
         format.simple()
-      ),
-        transports: [ new transports.Console() ] 
+    ),
+    transports: [ new transports.Console() ]
   });
-  
+
 const st1Repo = new St1Repository(process.env.MONGODB_ATLAS_CLUSTER_URI_RW || "");
-const st1Twitter = new St1TwitterClient({
+const st1Twitter = new TwitterClient({
     accessToken: process.env.TWITTER_ACCESS_TOKEN || "",
     accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET || "",
     consumerKey: process.env.TWITTER_CONSUMER_KEY || "",
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET || "",
 });
 
-async function findLatestTweetId(): Promise<Long> {
+async function findLatestTweetId(): Promise<string> {
     const latestTweet = await st1Repo.findLatest();
-    if (latestTweet === undefined) {
+    if (latestTweet === null) {
         throw new Error("Latest tweet not found");
     }
 
     const sinceId = latestTweet._id;
-    if (sinceId === undefined) {
-        throw new Error("Id not found");
-    }
 
-    return sinceId;
+    return sinceId.toString();
 }
 
-function storeTweets(tweetStream: Observable<ITweetDoc>): Promise<void> {
+function storeTweets(tweetStream: Observable<Tweet>): Promise<void> {
     return new Promise((resolve, reject) => {
         tweetStream.pipe(
+            map(tweet => toIStoredTweetDoc(tweet)),
             toArray()
         ).subscribe(
             (tweets) => {
@@ -70,13 +68,12 @@ async function pollerHandler(
 
     logger.info("Find latest tweet id");
 
-    const id: Long = await findLatestTweetId();
-    const idStr = id.toString();
-    logger.info("Latest tweet id is %s", idStr);
+    const id:string = await findLatestTweetId();
+    logger.info("Latest tweet id is %s", id);
 
     // Should probably stream the tweets to mongo with backpressure and what not...
-    logger.info("Fetching and storing tweets newer than %s", idStr);
-    const newestTweets = st1Twitter.fetchTweetsNewerThan(id);
+    logger.info("Fetching and storing tweets newer than %s", id);
+    const newestTweets = st1Twitter.fetchTweetsNewerThan(id, "st1sverige");
     await storeTweets(newestTweets);
     logger.info("Tweets stored successfully");
 }

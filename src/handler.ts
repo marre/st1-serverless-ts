@@ -3,12 +3,12 @@ import { createLogger, format, transports  } from "winston";
 import { St1 } from "./St1";
 import { St1Repository } from "./St1Repository";
 
-const logger = createLogger({ 
+const logger = createLogger({
   format: format.combine(
       format.splat(),
       format.simple()
     ),
-    transports: [ new transports.Console() ] 
+    transports: [ new transports.Console() ]
 });
 
 let cachedSt1: St1;

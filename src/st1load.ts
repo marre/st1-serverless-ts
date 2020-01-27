@@ -5,9 +5,9 @@ import { St1Repository } from "./St1Repository";
 const logger = createLogger({
     format: format.combine(
         format.splat(),
-        format.simple()
+        format.simple(),
     ),
-    transports: [ new transports.Console() ]
+    transports: [ new transports.Console() ],
 });
 
 const atlasUri: string = process.env.MONGODB_ATLAS_CLUSTER_URI_R || "";

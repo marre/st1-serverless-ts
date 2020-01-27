@@ -1,5 +1,5 @@
 import { Collection, Long, MongoClient } from "mongodb";
-import { Subscriber, Observable, identity } from "rxjs";
+import { Observable, Subscriber } from "rxjs";
 import { createLogger, format, transports } from "winston";
 
 /**
@@ -36,13 +36,13 @@ export function isIStoredTweetDoc(x: any): x is IStoredTweetDoc {
 const logger = createLogger({
     format: format.combine(
         format.splat(),
-        format.simple()
+        format.simple(),
       ),
-      transports: [ new transports.Console() ]
+      transports: [ new transports.Console() ],
   });
 
 export class St1Repository {
-    private mongo: Promise<MongoClient>;
+    private readonly mongo: Promise<MongoClient>;
 
     constructor(mongoUrl: string) {
         // Connect here in constructor to make sure that we only
@@ -69,7 +69,7 @@ export class St1Repository {
     }
 
     public findAll(): Observable<IStoredTweetDoc> {
-        return new Observable((subscriber : Subscriber<IStoredTweetDoc>) => {
+        return new Observable((subscriber: Subscriber<IStoredTweetDoc>) => {
             this.getCollection()
                 .then((collection) => {
                     const cursor = collection.find({}, {batchSize: 10000, sort: { _id: 1}});
@@ -83,12 +83,12 @@ export class St1Repository {
                             }
                         });
                     })
-                .catch((err) => subscriber.error(err))
+                .catch((err) => subscriber.error(err));
         });
     }
 
     public findNew(lastTweetId: Long): Observable<IStoredTweetDoc> {
-        return new Observable((subscriber : Subscriber<IStoredTweetDoc> ) => {
+        return new Observable((subscriber: Subscriber<IStoredTweetDoc> ) => {
             this.getCollection()
                 .then((collection) => {
                     // Iternally the tweet id is a string, but stored in mongo
@@ -113,7 +113,7 @@ export class St1Repository {
 
     public async insertAll(tweets: IStoredTweetDoc[]): Promise<void> {
         const collection = await this.getCollection();
-        const result = await collection.insertMany(tweets);
+        await collection.insertMany(tweets);
     }
 
     private async getCollection(): Promise<Collection<IStoredTweetDoc>> {

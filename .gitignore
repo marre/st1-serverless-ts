@@ -6,6 +6,8 @@ jspm_packages/
 .webpack/
 .serverless/
 
+.idea/
+
 backup/
 dump/
 

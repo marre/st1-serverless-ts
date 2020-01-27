@@ -2,7 +2,6 @@ import { Observable } from "rxjs";
 
 /**
  * Split the given stream on the given separator (default '\n').
- * @param executor An observable returning each part.
  */
 export function splitStream(readStream: NodeJS.ReadableStream, separator: string = "\n"): Observable<string> {
     return new Observable((subscriber) => {

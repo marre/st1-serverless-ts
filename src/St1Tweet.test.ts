@@ -1,9 +1,11 @@
-import { St1Tweet } from "./St1Tweet";
-import { IStoredTweetDoc, isIStoredTweetDoc } from "./St1Repository";
 import { Long } from "mongodb";
+import { IStoredTweetDoc } from "./St1Repository";
+import { St1Tweet } from "./St1Tweet";
 
 test("parse() should ignore tweet without date", () => {
-    const tweet = St1Tweet.parse("987654321987654321", "Prisändring:\nE85: 9,19\nB95: 14,88\nDiesel: 14,42\n#St1DrWest");
+    const tweet = St1Tweet.parse(
+        "987654321987654321",
+        "Prisändring:\nE85: 9,19\nB95: 14,88\nDiesel: 14,42\n#St1DrWest");
     expect(tweet).toBe(null);
 });
 
@@ -15,7 +17,11 @@ test("parse() should ignore non price tweets", () => {
 test("parse() should parse tweet #1", () => {
     const tweet = St1Tweet.parse(
         "987654321987654321",
-        "Prisändring:\nE85: 9,19\nB95: 14,88\nDiesel: 14,42\n#St1DrWest\n\n2014-06-27 10:29:07") as St1Tweet;
+        "Prisändring:\nE85: 9,19\nB95: 14,88\nDiesel: 14,42\n#St1DrWest\n\n2014-06-27 10:29:07");
+
+    if (tweet === null) {
+        fail("tweet is null");
+    }
 
     expect(tweet.tweetId).toBe("987654321987654321");
 
@@ -28,7 +34,7 @@ test("parse() should parse tweet #1", () => {
 });
 
 test("Serialized IStoredTweetDoc should have _id stored as string", () => {
-   const storedTweet:IStoredTweetDoc = {
+   const storedTweet: IStoredTweetDoc = {
        _id: Long.fromString("987654321987654321"),
        text: "Text",
    };
@@ -39,8 +45,8 @@ test("Serialized IStoredTweetDoc should have _id stored as string", () => {
    expect(parsedStoredTweet._id).toBe("987654321987654321");
 });
 
-test("Serialized  should have _id stored as string", () => {
-    const tweet:IStoredTweetDoc = {
+test("Serialized should have _id stored as string", () => {
+    const tweet: IStoredTweetDoc = {
         _id: Long.fromString("987654321987654321"),
         text: "Tweet",
     };

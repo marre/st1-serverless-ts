@@ -2,20 +2,20 @@ import fs = require("fs");
 import rp = require("request-promise-native");
 
 // Borrow Long from mongo as a 64 bit integer for tweet ids
-import { Long } from "mongodb";
-import { map, filter } from 'rxjs/operators';
-import { createLogger, format, transports } from "winston";
-import { splitStream } from "./splitStream";
-import { St1Repository, IStoredTweetDoc } from "./St1Repository";
-import { St1Tweet } from "./St1Tweet";
-import { Tweet } from "./Tweet";
+import {Long} from "mongodb";
+import {map} from 'rxjs/operators';
+import {createLogger, format, transports} from "winston";
+import {splitStream} from "./splitStream";
+import {IStoredTweetDoc, St1Repository} from "./St1Repository";
+import {St1Tweet} from "./St1Tweet";
+import {Tweet} from "./Tweet";
 
 const logger = createLogger({
     format: format.combine(
         format.splat(),
-        format.simple()
+        format.simple(),
     ),
-    transports: [ new transports.Console() ]
+    transports: [ new transports.Console() ],
   });
 
 const b95 = "b95";
@@ -75,7 +75,7 @@ export class St1 {
         return new Promise((resolve, reject) => {
             splitStream(readStream).pipe(
                 map((row) => JSON.parse(row)),
-                map((parsed) => new Tweet(parsed._id, parsed.text))
+                map((parsed) => new Tweet(parsed._id, parsed.text)),
             )
             .subscribe(
                 (st1TweetData) => st1.appendTweetFromData(st1TweetData),
@@ -83,7 +83,7 @@ export class St1 {
                     logger.error("Failed to create with data from stream, using cached data only. %s", err);
                     resolve(st1);
                 },
-                () => resolve(st1)
+                () => resolve(st1),
             );
         });
     }
@@ -193,12 +193,10 @@ export class St1 {
 }
 
 export function toIStoredTweetDoc(tweet: Tweet): IStoredTweetDoc {
-    const storedTweetDoc:IStoredTweetDoc = {
+    return {
         _id: Long.fromString(tweet.tweetId),
         text: tweet.text,
     };
-
-    return storedTweetDoc;
 }
 
 export function toTweet(storedTweetDoc: IStoredTweetDoc): Tweet {
@@ -209,8 +207,7 @@ export function toTweet(storedTweetDoc: IStoredTweetDoc): Tweet {
 }
 
 async function readUri(uri: string): Promise<string> {
-    const data: string = await rp(uri);
-    return data;
+    return rp(uri);
 }
 
 function readFile(filename: string): Promise<string> {

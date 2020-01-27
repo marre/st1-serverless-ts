@@ -36,7 +36,7 @@ export class St1Tweet {
             return null;
         }
 
-        const st1Tweet = new St1Tweet(
+        return new St1Tweet(
             tweetId,
             location,
             priceDate,
@@ -44,8 +44,6 @@ export class St1Tweet {
             priceB95,
             priceDiesel,
         );
-
-        return st1Tweet;
     }
 
     private static maybePriceTweet(tweet: string): boolean {

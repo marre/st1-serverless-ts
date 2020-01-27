@@ -6,40 +6,42 @@ import { St1Repository } from "./St1Repository";
 const logger = createLogger({
   format: format.combine(
       format.splat(),
-      format.simple()
+      format.simple(),
     ),
-    transports: [ new transports.Console() ]
+    transports: [ new transports.Console() ],
 });
 
 let cachedSt1: St1;
 
 async function getSt1(): Promise<St1> {
-  if (cachedSt1 === undefined) {
-    logger.info("No cached st1 handle");
-
-    // Load into cache
-    const cacheUri = process.env.ST1_CACHE_URI;
-    if (! cacheUri) {
-      logger.info("No cache-uri specified, returning an empty st1 handle");
-      return St1.createEmpty();
-    }
-
-    logger.info("Load from cache uri '%s'", cacheUri);
-    cachedSt1 = await St1.createFromCacheURI(cacheUri);
-
-    const atlasUri = process.env.MONGODB_ATLAS_CLUSTER_URI_R;
-    if (! atlasUri) {
-      // No DB URI defined. Go with the cached data only then
-      logger.info("No db-uri specified, returning cached st1 handle");
-      return cachedSt1;
-    }
-
-    // Fill in with later tweets
-    logger.info("Fill in st1 with latest tweets");
-    const st1Repo = new St1Repository(atlasUri);
-    await cachedSt1.updateWithTweetsFromDb(st1Repo);
-    logger.info("St1 handle created");
+  if (cachedSt1 !== undefined) {
+    return cachedSt1;
   }
+
+  logger.info("No cached st1 handle");
+
+  // Load into cache
+  const cacheUri = process.env.ST1_CACHE_URI;
+  if (!cacheUri) {
+    logger.info("No cache-uri specified, returning an empty st1 handle");
+    return St1.createEmpty();
+  }
+
+  logger.info("Load from cache uri '%s'", cacheUri);
+  cachedSt1 = await St1.createFromCacheURI(cacheUri);
+
+  const atlasUri = process.env.MONGODB_ATLAS_CLUSTER_URI_R;
+  if (!atlasUri) {
+    // No DB URI defined. Go with the cached data only then
+    logger.info("No db-uri specified, returning cached st1 handle");
+    return cachedSt1;
+  }
+
+  // Fill in with later tweets
+  logger.info("Fill in st1 with latest tweets");
+  const st1Repo = new St1Repository(atlasUri);
+  await cachedSt1.updateWithTweetsFromDb(st1Repo);
+  logger.info("St1 handle created");
 
   return cachedSt1;
 }

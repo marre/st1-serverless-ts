@@ -1,5 +1,13 @@
 ## Serverless st1 petrol price thingy
 
+---
+
+NOTE! ST1 stopped tweeting petrol prices, so this project is archived now.
+
+A complete dump is available in `data/dump-2022-01-18.json` it contains petrol prices from 2014-06-21 to 2022-01-18.
+
+----
+
 St1 petrol stations in Sweden is tweeting petrol price changes in real time since 2014. This project polls these price changes and stores them into a mongo database. The project also provides a simple HTTP API that makes it possible to retrieve historic prices for any St1 petrol station.
 
 This is actually v2 of this project, the original project was written in python and deployed to heroku (https://st1price.herokuapp.com). This remake is my way of learning more about serverless, typescript, mongo and modern web frontends.

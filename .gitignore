@@ -11,6 +11,4 @@ jspm_packages/
 backup/
 dump/
 
-data/
-
 env.sh
